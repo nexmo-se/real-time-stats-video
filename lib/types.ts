@@ -35,6 +35,8 @@ export interface InferenceDimensions {
   model144: Dimensions;
 }
 
+export interface Statistics {}
+
 /**
  * ImageFit specifies the positioning of an image inside a viewport.
  */

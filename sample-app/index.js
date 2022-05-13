@@ -72,6 +72,8 @@ async function publishToSession() {
         getRtcStats(publisher).then((srtpCypher) => console.log(srtpCypher));
         stats.setPublisher(publisher);
         stats.startStats();
+        stats.getCypher().then((c) => console.log(c));
+        stats.getConnectionType().then((c) => console.log(c));
       }
     });
   });

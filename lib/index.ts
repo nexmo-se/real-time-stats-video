@@ -1,6 +1,8 @@
 import log from 'loglevel';
 
-import { logPublisher } from './utils/publisher';
+import { logPublisher, getRtcStats } from './utils/publisher';
+
+import { VideoNetworkQualityStats } from './utils/RealTimeStats';
 
 window.OT = window.OT || {};
 
@@ -10,6 +12,8 @@ if (process.env.NODE_ENV === 'production') {
 
 window.OT.RealTimeStats = {
   logPublisher,
+  getRtcStats,
+  VideoNetworkQualityStats,
 };
 
-export { logPublisher };
+export { logPublisher, getRtcStats };
