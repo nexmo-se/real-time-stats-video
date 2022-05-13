@@ -1,0 +1,17 @@
+{
+  "include": ["lib/**/*.ts"],
+  "compilerOptions": {
+    "declaration": true,
+    "target": "es2017",
+    "lib": ["es2017", "es2017.object", "dom"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "inlineSources": true,
+    "strict": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "strictPropertyInitialization": false
+  }
+}
