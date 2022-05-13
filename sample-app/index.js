@@ -1,7 +1,13 @@
 'use strict';
 
-const { logPublisher, getRtcStats } = OT.RealTimeStats;
+const {
+  logPublisher,
+  getRtcStats,
+  VideoNetworkQualityStats,
+} = OT.RealTimeStats;
 const bootstrap = window.bootstrap;
+
+const stats = new VideoNetworkQualityStats({ intervalStats: 3000 });
 
 const apikey = '47413651';
 const sessionId =
@@ -47,14 +53,7 @@ async function publishToSession() {
       else console.log('Subscribed to ', stream);
     });
   });
-  session.on('streamPropertyChanged', (event) => {
-    if (event.stream === publisher.stream) {
-      if (event.changedProperty === 'hasVideo') {
-        // make sure we pause effect processing while we are not publishing video
-        effectProcessor.pauseStreamProcessing(!event.event.newValue);
-      }
-    }
-  });
+
   session.connect(token, (err) => {
     if (err) {
       console.error('Error while connecting to the session falling', err);
@@ -71,6 +70,8 @@ async function publishToSession() {
         logPublisher(publisher);
 
         getRtcStats(publisher).then((srtpCypher) => console.log(srtpCypher));
+        stats.setPublisher(publisher);
+        stats.startStats();
       }
     });
   });
