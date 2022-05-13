@@ -1,6 +1,6 @@
 'use strict';
 
-const { logPublisher } = OT.RealTimeStats;
+const { logPublisher, getRtcStats } = OT.RealTimeStats;
 const bootstrap = window.bootstrap;
 
 const apikey = '47413651';
@@ -69,6 +69,8 @@ async function publishToSession() {
         console.log('Successfully published the stream');
 
         logPublisher(publisher);
+
+        getRtcStats(publisher).then((srtpCypher) => console.log(srtpCypher));
       }
     });
   });
