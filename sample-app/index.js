@@ -67,11 +67,13 @@ async function publishToSession() {
       else {
         console.log('Successfully published the stream');
 
-        logPublisher(publisher);
-
         getRtcStats(publisher).then((srtpCypher) => console.log(srtpCypher));
         stats.setPublisher(publisher);
         stats.startStats();
+        stats.on('udp', (event) => {
+          console.log(event);
+        });
+
         stats.getCypher().then((c) => console.log(c));
         stats.getConnectionType().then((c) => console.log(c));
       }
