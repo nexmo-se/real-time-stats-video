@@ -9,11 +9,11 @@ const bootstrap = window.bootstrap;
 
 const stats = new VideoNetworkQualityStats({ intervalStats: 3000 });
 
-const apikey = '47413651';
+const apikey = '46264952';
 const sessionId =
-  '2_MX40NzQxMzY1MX5-MTY1MjQzNDIxMjgyNn5BcTdJU1duZEZMWlcxVVdSSnNzVFREaUd-fg';
+  '2_MX40NjI2NDk1Mn5-MTY1MjcxNDg0NjE2N350RnNHckVXalZLV0ZUbGRTTUEvWi8vcXN-fg';
 const token =
-  'T1==cGFydG5lcl9pZD00NzQxMzY1MSZzaWc9NWRjYzg0NjZiZDFlZDQ5OTcyZWE2OGVkYjA1NDFmNjk2YjhlYWVlMTpzZXNzaW9uX2lkPTJfTVg0ME56UXhNelkxTVg1LU1UWTFNalF6TkRJeE1qZ3lObjVCY1RkSlUxZHVaRVpNV2xjeFZWZFNTbk56VkZSRWFVZC1mZyZjcmVhdGVfdGltZT0xNjUyNDM0MjI2Jm5vbmNlPTAuMDEwNjczMjE1NTM2NTUyNTM4JnJvbGU9cHVibGlzaGVyJmV4cGlyZV90aW1lPTE2NTMwMzkwMjUmaW5pdGlhbF9sYXlvdXRfY2xhc3NfbGlzdD0=';
+  'T1==cGFydG5lcl9pZD00NjI2NDk1MiZzaWc9MTM0Nzg3NmNiZjUwMzkwN2ZlYjE2YjhmY2Y5YzhiMTZhMGYzZGI1YTpzZXNzaW9uX2lkPTJfTVg0ME5qSTJORGsxTW41LU1UWTFNamN4TkRnME5qRTJOMzUwUm5OSGNrVlhhbFpMVjBaVWJHUlRUVUV2V2k4dmNYTi1mZyZjcmVhdGVfdGltZT0xNjUyNzE0ODU2Jm5vbmNlPTAuNjc1MzY4NDQ4NDk2MzgyNyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjUyODAxMjU1JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9';
 
 async function getLocalMedia() {
   try {

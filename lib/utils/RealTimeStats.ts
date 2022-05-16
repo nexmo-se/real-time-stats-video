@@ -48,18 +48,24 @@ enum OutputState {
 }
 
 export interface VideoNetworkQualityStats {
-  on(event: 'udp', listener: (reason: string) => void): this; // session connected event
+  on(event: 'qualityLimitated', listener: (reason: string) => void): this; // session connected event
 }
 
 export class VideoNetworkQualityStats extends EventEmitter {
   public _publisher: OT.Publisher;
   public _statsInterval: number;
   private _interval: setInterval;
+  private prevTimeStamp;
+  private prevPacketsSent;
+  private simulcastLayers: any;
 
   constructor(options: RealTimeOptions) {
     super();
     // this._useWasm =
     //   typeof options.useWasm === 'boolean' ? options.useWasm : true;
+    this.prevTimeStamp = {};
+    this.simulcastLayers = [];
+    this.prevPacketsSent = {};
     this._publisher = null;
     this._statsInterval = options.intervalStats;
     this._interval = null;
@@ -81,6 +87,42 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this._publisher = publisher;
   }
 
+  checkIfQualityLimited(stats: any) {
+    stats[0].rtcStatsReport.forEach((e: any) => {
+      if (e.type === 'outbound-rtp' && e.kind === 'video') {
+        if (this.prevTimeStamp[e.ssrc] && this.prevPacketsSent[e.ssrc]) {
+          const timedif = e.timestamp - this.prevTimeStamp[e.ssrc];
+          const bytesDif = e.bytesSent - this.prevPacketsSent[e.ssrc];
+          const bitSec = (8 * bytesDif) / timedif;
+
+          const newLayers = {
+            width: e.frameWidth,
+            height: e.frameHeight,
+            framesPerSecond: e.framesPerSecond,
+            qualityLimitationReason: e.qualityLimitationReason,
+            id: e.ssrc,
+            bytes: bitSec,
+            packetsDiff: e.packetsSent - this.prevPacketsSent[e.ssrc],
+            // rtt: result?.rtt ? result.rtt : 0,
+          };
+          this.simulcastLayers = [...this.simulcastLayers, newLayers];
+          // this.simulcastLayers.push()
+          this.simulcastLayers.forEach((layer) => {
+            console.log(layer.qualityLimitationReason != 'none');
+            if (layer.qualityLimitationReason !== 'none') {
+              this.emit('qualityLimitated', 'test');
+            }
+          });
+          //   console.log(this.simulcastLayers);
+        }
+
+        this.prevPacketsSent[e.ssrc] = e.packetsSent;
+        this.prevTimeStamp[e.ssrc] = e.timestamp;
+        // prevBytesSent[e.ssrc] = e.bytesSent;
+      }
+    });
+  }
+
   async attachEvents(): Promise<void> {
     // const stats = new EventEmitter();
     // this.on('udp', (reason: string) => console.log(reason));
@@ -92,16 +134,17 @@ export class VideoNetworkQualityStats extends EventEmitter {
     // const stats = new EventEmitter();
     // this.on('udp', (reason: string) => console.log(reason));
 
-    this.attachEvents().then(() => {
-      this.emit('udp', 'test');
-    });
+    // this.attachEvents().then(() => {
+    //   this.emit('udp', 'test');
+    // });
     //
     setInterval(async () => {
-      console.log('interval called');
+      this.simulcastLayers = [];
       //   this._publisher.getStats((err: any, resp: any) => {
       //     console.log(resp);
       //   });
       const stats = await getRtcStats(this._publisher);
+      this.checkIfQualityLimited(stats);
 
       //   stats[0].rtcStatsReport.forEach((e: any) => {
       //     if (e.type === 'transport') {
@@ -109,7 +152,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
       //       this.emit('udp', e.srtpCipher);
       //     }
       //   });
-      console.log(stats);
+      //   console.log(stats);
       return stats;
     }, this._statsInterval);
   }
