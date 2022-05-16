@@ -47,28 +47,22 @@ enum OutputState {
   INPUT_FORWARDING,
 }
 
-export class VideoNetworkQualityStats {
-  private readonly _assetsPath: string;
-  private readonly _useWasm: boolean;
+export interface VideoNetworkQualityStats {
+  on(event: 'udp', listener: (reason: string) => void): this; // session connected event
+}
+
+export class VideoNetworkQualityStats extends EventEmitter {
   public _publisher: OT.Publisher;
   public _statsInterval: number;
   private _interval: setInterval;
 
-  private readonly _inputVideoElement: HTMLVideoElement;
-  private readonly _outputCanvasElement: HTMLCanvasElement;
-  private readonly _outputCanvasCtx: CanvasRenderingContext2D;
-
-  private readonly _outputFramesPerSecond: number;
-  private readonly _maskFrameTimerWorker: any;
-
-  private _inputStream: MediaStream;
-  private _inputVideoTrack: MediaStreamTrack;
-
   constructor(options: RealTimeOptions) {
+    super();
     // this._useWasm =
     //   typeof options.useWasm === 'boolean' ? options.useWasm : true;
     this._publisher = null;
     this._statsInterval = options.intervalStats;
+    this._interval = null;
 
     // this._maskFrameTimerWorker.onmessage = (e: MessageEvent) => {
     //   if (e.data.id !== TIMEOUT_TICK) return;
@@ -87,15 +81,42 @@ export class VideoNetworkQualityStats {
     this._publisher = publisher;
   }
 
+  async attachEvents(): Promise<void> {
+    // const stats = new EventEmitter();
+    // this.on('udp', (reason: string) => console.log(reason));
+  }
+
   startStats() {
+    // stats.on('')
+
+    // const stats = new EventEmitter();
+    // this.on('udp', (reason: string) => console.log(reason));
+
+    this.attachEvents().then(() => {
+      this.emit('udp', 'test');
+    });
+    //
     setInterval(async () => {
+      console.log('interval called');
       //   this._publisher.getStats((err: any, resp: any) => {
       //     console.log(resp);
       //   });
       const stats = await getRtcStats(this._publisher);
+
+      //   stats[0].rtcStatsReport.forEach((e: any) => {
+      //     if (e.type === 'transport') {
+      //       console.log(e.srtpCipher);
+      //       this.emit('udp', e.srtpCipher);
+      //     }
+      //   });
       console.log(stats);
       return stats;
     }, this._statsInterval);
+  }
+
+  stopStats() {
+    clearInterval(this._interval);
+    this._interval = null;
   }
 
   async getCypher(): Promise<string> {
