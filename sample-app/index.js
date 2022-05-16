@@ -70,7 +70,10 @@ async function publishToSession() {
         getRtcStats(publisher).then((srtpCypher) => console.log(srtpCypher));
         stats.setPublisher(publisher);
         stats.startStats();
-        stats.on('udp', (event) => {
+        stats.on('qualityLimitated', (event) => {
+          console.log(event);
+        });
+        stats.on('qualityLimitatedStopped', (event) => {
           console.log(event);
         });
 

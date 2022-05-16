@@ -49,6 +49,10 @@ enum OutputState {
 
 export interface VideoNetworkQualityStats {
   on(event: 'qualityLimitated', listener: (reason: string) => void): this; // session connected event
+  on(
+    event: 'qualityLimitatedStopped',
+    listener: (reason: string) => void
+  ): this;
 }
 
 export class VideoNetworkQualityStats extends EventEmitter {
@@ -58,6 +62,8 @@ export class VideoNetworkQualityStats extends EventEmitter {
   private prevTimeStamp;
   private prevPacketsSent;
   private simulcastLayers: any;
+  private isQualityLimitated: boolean;
+  private wasQualityLimited: boolean;
 
   constructor(options: RealTimeOptions) {
     super();
@@ -69,6 +75,8 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this._publisher = null;
     this._statsInterval = options.intervalStats;
     this._interval = null;
+    this.isQualityLimitated = false;
+    this.wasQualityLimited = false;
 
     // this._maskFrameTimerWorker.onmessage = (e: MessageEvent) => {
     //   if (e.data.id !== TIMEOUT_TICK) return;
@@ -109,8 +117,20 @@ export class VideoNetworkQualityStats extends EventEmitter {
           // this.simulcastLayers.push()
           this.simulcastLayers.forEach((layer) => {
             console.log(layer.qualityLimitationReason != 'none');
-            if (layer.qualityLimitationReason !== 'none') {
-              this.emit('qualityLimitated', 'test');
+            if (
+              layer.qualityLimitationReason !== 'none' &&
+              this.isQualityLimitated === false &&
+              !this.wasQualityLimited
+            ) {
+              this.isQualityLimitated = true;
+              this.emit('qualityLimitated', 'qualityLimited');
+            } else if (
+              this.wasQualityLimited &&
+              layer.qualityLimitationReason === 'none' &&
+              this.isQualityLimitated
+            ) {
+              this.isQualityLimitated = false;
+              this.emit('qualityLimitatedStopped', 'qualityLimitedStopped');
             }
           });
           //   console.log(this.simulcastLayers);
@@ -118,6 +138,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
 
         this.prevPacketsSent[e.ssrc] = e.packetsSent;
         this.prevTimeStamp[e.ssrc] = e.timestamp;
+        this.wasQualityLimited = this.isQualityLimitated;
         // prevBytesSent[e.ssrc] = e.bytesSent;
       }
     });
