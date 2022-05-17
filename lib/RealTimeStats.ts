@@ -1,7 +1,7 @@
 import log, { error } from 'loglevel';
 import { logPublisher, getRtcStats } from './utils/publisher';
 import { EventEmitter } from 'events';
-import { QualityEvent, RTCStatsReport } from './types';
+import { QualityEvent, RTCStatsReport, PacketLossEvent } from './types';
 
 /**
  * @private
@@ -51,6 +51,11 @@ export interface VideoNetworkQualityStats {
     event: 'qualityLimitatedStopped',
     listener: (event: QualityEvent) => void
   ): this;
+  on(event: 'highPacketLoss', listener: (event: PacketLossEvent) => void): this;
+  on(
+    event: 'highPacketLossStopped',
+    listener: (event: PacketLossEvent) => void
+  ): this;
 }
 
 export class VideoNetworkQualityStats extends EventEmitter {
@@ -62,6 +67,8 @@ export class VideoNetworkQualityStats extends EventEmitter {
   private simulcastLayers: any;
   private isQualityLimitated: boolean;
   private wasQualityLimited: boolean;
+  private hasPacketLoss: boolean;
+  private hadPacketLoss: boolean;
   private prevPacketsLost = {};
   private packetLossArray: any;
   private layersWithPacketLoss: any;
@@ -76,10 +83,12 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this.prevPacketsSent = {};
     this._publisher = null;
     this._statsInterval = options.intervalStats;
-    // this._VideoPacketLossThreshold = options.VideoPacketLossThreshold;
+    this._VideoPacketLossThreshold = options.VideoPacketLossThreshold;
     this._interval = null;
     this.isQualityLimitated = false;
     this.wasQualityLimited = false;
+    this.hasPacketLoss = false;
+    this.hadPacketLoss = false;
     this.prevPacketsSent = {};
     this.prevPacketsLost = {};
     this.packetLossArray = [];
@@ -197,12 +206,33 @@ export class VideoNetworkQualityStats extends EventEmitter {
             const upperLayer = this.layersWithPacketLoss.find(function(layer) {
               return layer.id == maxSsrc;
             });
-            if (upperLayer.packetLost > 3) {
-              console.log(upperLayer.packetLost);
+            if (
+              upperLayer.packetLost >= this._VideoPacketLossThreshold &&
+              !this.hadPacketLoss &&
+              !this.hasPacketLoss
+            ) {
+              this.hasPacketLoss = true;
+              this.emit('highPacketLoss', {
+                streamId: this._publisher.stream.id,
+                type: 'video',
+                packetLossThreshold: this._VideoPacketLossThreshold,
+              });
+            } else if (
+              this.hadPacketLoss &&
+              this.hasPacketLoss &&
+              upperLayer.packetLost < this._VideoPacketLossThreshold
+            ) {
+              this.hasPacketLoss = false;
+              this.emit('highPacketLossStopped', {
+                streamId: this._publisher.stream.id,
+                type: 'video',
+                packetLossThreshold: this._VideoPacketLossThreshold,
+              });
             }
           }
         }
       }
+      this.hadPacketLoss = this.hasPacketLoss;
     }
   }
 

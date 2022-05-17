@@ -71,6 +71,12 @@ export type QualityEvent = {
   targetQuality: string;
 };
 
+export type PacketLossEvent = {
+  streanId: string;
+  type: string;
+  packetLoss: number;
+};
+
 export interface RTCStatsReport {
   forEach(
     callbackfn: (value: any, key: string, parent: RTCStatsReport) => void,
