@@ -5,6 +5,7 @@ const {
   getRtcStats,
   VideoNetworkQualityStats,
 } = OT.RealTimeStats;
+
 const bootstrap = window.bootstrap;
 
 const stats = new VideoNetworkQualityStats({ intervalStats: 3000 });
@@ -14,6 +15,17 @@ const sessionId =
   '2_MX40NjI2NDk1Mn5-MTY1MjcxNDg0NjE2N350RnNHckVXalZLV0ZUbGRTTUEvWi8vcXN-fg';
 const token =
   'T1==cGFydG5lcl9pZD00NjI2NDk1MiZzaWc9MTM0Nzg3NmNiZjUwMzkwN2ZlYjE2YjhmY2Y5YzhiMTZhMGYzZGI1YTpzZXNzaW9uX2lkPTJfTVg0ME5qSTJORGsxTW41LU1UWTFNamN4TkRnME5qRTJOMzUwUm5OSGNrVlhhbFpMVjBaVWJHUlRUVUV2V2k4dmNYTi1mZyZjcmVhdGVfdGltZT0xNjUyNzE0ODU2Jm5vbmNlPTAuNjc1MzY4NDQ4NDk2MzgyNyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjUyODAxMjU1JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9';
+
+const openToast = (message, action) => {
+  const toast = document.getElementById('toast');
+  if (action === 'show') {
+    toast.classList.add('show');
+    const toastBody = document.getElementById('toast-body');
+    toastBody.innerText = message;
+  } else {
+    toast.classList.remove('show');
+  }
+};
 
 async function getLocalMedia() {
   try {
@@ -71,9 +83,11 @@ async function publishToSession() {
         stats.setPublisher(publisher);
         stats.startStats();
         stats.on('qualityLimitated', (event) => {
+          openToast('You may face quality issues', 'show');
           console.log(event);
         });
         stats.on('qualityLimitatedStopped', (event) => {
+          openToast('You may face quality issues', 'hide');
           console.log(event);
         });
 

@@ -2,7 +2,7 @@ import log from 'loglevel';
 
 import { logPublisher, getRtcStats } from './utils/publisher';
 
-import { VideoNetworkQualityStats } from './utils/RealTimeStats';
+import { VideoNetworkQualityStats } from './RealTimeStats';
 
 window.OT = window.OT || {};
 

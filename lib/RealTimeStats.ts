@@ -1,16 +1,14 @@
 import log, { error } from 'loglevel';
-import { logPublisher, getRtcStats } from './publisher';
+import { logPublisher, getRtcStats } from './utils/publisher';
 import { EventEmitter } from 'events';
-
-// import {loadTFLite} from './TFLiteLoader';
-// import {BackgroundEffect} from './background/backgroundEffect';
-// import {supportsDirectForwarding, VideoTrackToCanvas} from './VideoTrackToCanvas';
-// import {Dimensions} from '../types';
+import { QualityEvent, RTCStatsReport } from './types';
 
 /**
  * @private
  */
 export interface RealTimeOptions {
+  VideoPacketLossThreshold: number;
+
   /**
    * The assets path where the models and tflite are loaded.
    * These assets can be copied from the `dist/build` folder.
@@ -48,10 +46,10 @@ enum OutputState {
 }
 
 export interface VideoNetworkQualityStats {
-  on(event: 'qualityLimitated', listener: (reason: string) => void): this; // session connected event
+  on(event: 'qualityLimitated', listener: (event: QualityEvent) => void): this; // session connected event
   on(
     event: 'qualityLimitatedStopped',
-    listener: (reason: string) => void
+    listener: (event: QualityEvent) => void
   ): this;
 }
 
@@ -59,11 +57,15 @@ export class VideoNetworkQualityStats extends EventEmitter {
   public _publisher: OT.Publisher;
   public _statsInterval: number;
   private _interval: setInterval;
-  private prevTimeStamp;
-  private prevPacketsSent;
+  private prevTimeStamp: number;
+  private prevPacketsSent: number;
   private simulcastLayers: any;
   private isQualityLimitated: boolean;
   private wasQualityLimited: boolean;
+  private prevPacketsLost = {};
+  private packetLossArray: any;
+  private layersWithPacketLoss: any;
+  public _VideoPacketLossThreshold: number;
 
   constructor(options: RealTimeOptions) {
     super();
@@ -74,28 +76,25 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this.prevPacketsSent = {};
     this._publisher = null;
     this._statsInterval = options.intervalStats;
+    // this._VideoPacketLossThreshold = options.VideoPacketLossThreshold;
     this._interval = null;
     this.isQualityLimitated = false;
     this.wasQualityLimited = false;
-
-    // this._maskFrameTimerWorker.onmessage = (e: MessageEvent) => {
-    //   if (e.data.id !== TIMEOUT_TICK) return;
-    //   this.renderFrame();
-    // };
+    this.prevPacketsSent = {};
+    this.prevPacketsLost = {};
+    this.packetLossArray = [];
+    this.layersWithPacketLoss = [];
   }
 
   /**
    * Returns true if the video stream processing is paused
    */
-  //   get paused(): boolean {
-  //     return this._outputState === OutputState.PAUSED;
-  //   }
 
   setPublisher(publisher: OT.publisher) {
     this._publisher = publisher;
   }
 
-  checkIfQualityLimited(stats: any) {
+  checkIfQualityLimited(stats: RTCStatsReport) {
     stats[0].rtcStatsReport.forEach((e: any) => {
       if (e.type === 'outbound-rtp' && e.kind === 'video') {
         if (this.prevTimeStamp[e.ssrc] && this.prevPacketsSent[e.ssrc]) {
@@ -116,21 +115,28 @@ export class VideoNetworkQualityStats extends EventEmitter {
           this.simulcastLayers = [...this.simulcastLayers, newLayers];
           // this.simulcastLayers.push()
           this.simulcastLayers.forEach((layer) => {
-            console.log(layer.qualityLimitationReason != 'none');
             if (
               layer.qualityLimitationReason !== 'none' &&
               this.isQualityLimitated === false &&
               !this.wasQualityLimited
             ) {
               this.isQualityLimitated = true;
-              this.emit('qualityLimitated', 'qualityLimited');
+              this.emit('qualityLimitated', {
+                streamId: this._publisher.stream.id,
+                reason: layer.qualityLimitationReason,
+                targetQuality: `${layer.width}X${layer.height}`,
+              });
             } else if (
               this.wasQualityLimited &&
               layer.qualityLimitationReason === 'none' &&
               this.isQualityLimitated
             ) {
               this.isQualityLimitated = false;
-              this.emit('qualityLimitatedStopped', 'qualityLimitedStopped');
+              this.emit('qualityLimitatedStopped', {
+                streamId: this._publisher.stream.id,
+                reason: layer.qualityLimitationReason,
+                targetQuality: `${layer.width}X${layer.height}`,
+              });
             }
           });
           //   console.log(this.simulcastLayers);
@@ -144,36 +150,71 @@ export class VideoNetworkQualityStats extends EventEmitter {
     });
   }
 
-  async attachEvents(): Promise<void> {
-    // const stats = new EventEmitter();
-    // this.on('udp', (reason: string) => console.log(reason));
+  checkVideoPacketLoss(stats: any): void {
+    stats[0].rtcStatsReport.forEach((e: RTCStatsReport) => {
+      if (e.type === 'remote-inbound-rtp' && e.kind === 'video') {
+        // const rtt = !isNaN(e.roundTripTime) ? e.roundTripTime : 0;
+        const rttObject = {
+          ssrc: e.ssrc,
+          rtt: e.roundTripTime,
+          jitter: e.jitter,
+          packetLostFraction: e.fractionLost * 100,
+          packetsLostDiff: e.packetsLost - this.prevPacketsLost[e.ssrc],
+        };
+        this.packetLossArray = [...this.packetLossArray, rttObject];
+
+        this.prevPacketsLost[e.ssrc] = e.packetsLost;
+        this.mergeArrays();
+      }
+    });
   }
 
-  startStats() {
-    // stats.on('')
+  mergeArrays(): void {
+    if (this.packetLossArray && this.simulcastLayers.length) {
+      this.layersWithPacketLoss = [];
+      // console.log(simulcastDef);
+      for (let layer of this.simulcastLayers) {
+        for (let rttLayer of this.packetLossArray) {
+          if (layer.id === rttLayer.ssrc && layer.framesPerSecond) {
+            const packetsTotal = layer.packetsDiff + rttLayer.packetsLostDiff;
+            const packetLostValue = rttLayer.packetsLostDiff / packetsTotal;
 
-    // const stats = new EventEmitter();
-    // this.on('udp', (reason: string) => console.log(reason));
+            const obj = {
+              rtt: rttLayer.rtt,
+              jitter: rttLayer.jitter,
+              // packetLostFraction: rttLayer.packetLostFraction,
+              packetLost: packetLostValue * 100,
+              ...layer,
+            };
+            this.layersWithPacketLoss = [...this.layersWithPacketLoss, obj];
 
-    // this.attachEvents().then(() => {
-    //   this.emit('udp', 'test');
-    // });
-    //
+            const maxSsrc = Math.max.apply(
+              Math,
+              this.layersWithPacketLoss.map(function(layer) {
+                return layer.id;
+              })
+            );
+            const upperLayer = this.layersWithPacketLoss.find(function(layer) {
+              return layer.id == maxSsrc;
+            });
+            if (upperLayer.packetLost > 3) {
+              console.log(upperLayer.packetLost);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  startStats(): void {
     setInterval(async () => {
       this.simulcastLayers = [];
-      //   this._publisher.getStats((err: any, resp: any) => {
-      //     console.log(resp);
-      //   });
+      this.packetLossArray = [];
+
       const stats = await getRtcStats(this._publisher);
       this.checkIfQualityLimited(stats);
+      this.checkVideoPacketLoss(stats);
 
-      //   stats[0].rtcStatsReport.forEach((e: any) => {
-      //     if (e.type === 'transport') {
-      //       console.log(e.srtpCipher);
-      //       this.emit('udp', e.srtpCipher);
-      //     }
-      //   });
-      //   console.log(stats);
       return stats;
     }, this._statsInterval);
   }

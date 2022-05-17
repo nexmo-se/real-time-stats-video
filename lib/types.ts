@@ -65,6 +65,26 @@ export enum ImageFit {
   None = 'None',
 }
 
+export type QualityEvent = {
+  streanId: string;
+  reason: string;
+  targetQuality: string;
+};
+
+export interface RTCStatsReport {
+  forEach(
+    callbackfn: (value: any, key: string, parent: RTCStatsReport) => void,
+    thisArg?: any
+  ): void;
+  type: string;
+  // roundTripTime: number;
+  kind: string;
+}
+
+export type PublisherRtcStatsReport = {
+  rtcStatsReport: RTCStatsReport;
+};
+
 // These defs should be provided by the TS Dom typedef lib but as they are new they haven't been added yet.
 declare global {
   /**
