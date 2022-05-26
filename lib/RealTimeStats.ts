@@ -30,21 +30,6 @@ export interface RealTimeOptions {
   triggerEvents?: boolean;
 }
 
-enum OutputState {
-  /**
-   * No output actively being sent
-   */
-  PAUSED,
-  /**
-   * The effect is applied to the output
-   */
-  EFFECT_APPLIED,
-  /**
-   * The input video is simply forwarded to the output
-   */
-  INPUT_FORWARDING,
-}
-
 export interface VideoNetworkQualityStats {
   on(event: 'qualityLimitated', listener: (event: QualityEvent) => void): this; // session connected event
   on(
