@@ -9,24 +9,10 @@ import { QualityEvent, RTCStatsReport, PacketLossEvent } from './types';
 export interface RealTimeOptions {
   VideoPacketLossThreshold: number;
 
-  /**
-   * The assets path where the models and tflite are loaded.
-   * These assets can be copied from the `dist/build` folder.
-   */
   frameRateThreshold: number;
 
-  /**
-   * The output video stream's frame rate in fps
-   * @default
-   * ```html
-   * 30
-   * ```
-   */
   intervalStats: number;
 
-  /**
-   * @private
-   */
   triggerEvents?: boolean;
 }
 
