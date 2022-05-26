@@ -62,8 +62,8 @@ export class VideoNetworkQualityStats extends EventEmitter {
   public _publisher: OT.Publisher;
   public _statsInterval: number;
   private _interval: setInterval;
-  private prevTimeStamp: number;
-  private prevPacketsSent: number;
+  private prevTimeStamp: {};
+  private prevPacketsSent: {};
   private simulcastLayers: any;
   private isQualityLimitated: boolean;
   private wasQualityLimited: boolean;
@@ -133,6 +133,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
               this.emit('qualityLimitated', {
                 streamId: this._publisher.stream.id,
                 reason: layer.qualityLimitationReason,
+                id: layer.id,
                 targetQuality: `${layer.width}X${layer.height}`,
               });
             } else if (
@@ -215,6 +216,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
               this.emit('highPacketLoss', {
                 streamId: this._publisher.stream.id,
                 type: 'video',
+                action: 'highPacketLossDetected',
                 packetLossThreshold: this._VideoPacketLossThreshold,
               });
             } else if (
@@ -226,6 +228,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
               this.emit('highPacketLossStopped', {
                 streamId: this._publisher.stream.id,
                 type: 'video',
+                action: 'highPacketLossStopped',
                 packetLossThreshold: this._VideoPacketLossThreshold,
               });
             }
@@ -259,7 +262,6 @@ export class VideoNetworkQualityStats extends EventEmitter {
       const stats = await getRtcStats(this._publisher);
       stats[0].rtcStatsReport.forEach((e: any) => {
         if (e.type === 'transport') {
-          console.log(e.srtpCipher);
           res(e.srtpCipher);
         }
       });

@@ -15,9 +15,9 @@ const stats = new VideoNetworkQualityStats({
 
 const apikey = '46264952';
 const sessionId =
-  '2_MX40NjI2NDk1Mn5-MTY1MjcxNDg0NjE2N350RnNHckVXalZLV0ZUbGRTTUEvWi8vcXN-fg';
+  '1_MX40NjI2NDk1Mn5-MTY1MzU2MzM4ODk0M35ObE1NOUx3WDl1bm9KckU5b01JVDZ1a1d-fg';
 const token =
-  'T1==cGFydG5lcl9pZD00NjI2NDk1MiZzaWc9MTM0Nzg3NmNiZjUwMzkwN2ZlYjE2YjhmY2Y5YzhiMTZhMGYzZGI1YTpzZXNzaW9uX2lkPTJfTVg0ME5qSTJORGsxTW41LU1UWTFNamN4TkRnME5qRTJOMzUwUm5OSGNrVlhhbFpMVjBaVWJHUlRUVUV2V2k4dmNYTi1mZyZjcmVhdGVfdGltZT0xNjUyNzE0ODU2Jm5vbmNlPTAuNjc1MzY4NDQ4NDk2MzgyNyZyb2xlPXB1Ymxpc2hlciZleHBpcmVfdGltZT0xNjUyODAxMjU1JmluaXRpYWxfbGF5b3V0X2NsYXNzX2xpc3Q9';
+  'T1==cGFydG5lcl9pZD00NjI2NDk1MiZzaWc9ZDE0ZWM5MjFhZDZjNzk5MWU4MzI3NWNjNmZiN2FjYjMwYTFiM2NlNDpzZXNzaW9uX2lkPTFfTVg0ME5qSTJORGsxTW41LU1UWTFNelUyTXpNNE9EazBNMzVPYkUxTk9VeDNXRGwxYm05S2NrVTViMDFKVkRaMWExZC1mZyZjcmVhdGVfdGltZT0xNjUzNTYzNDAwJm5vbmNlPTAuMzM1OTQ1MTMxMzg5NzAxMDYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTY1NjE1NTQwMCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==';
 
 const openToast = (type, message, action) => {
   const toast =
@@ -89,7 +89,7 @@ async function publishToSession() {
       else {
         console.log('Successfully published the stream');
 
-        getRtcStats(publisher).then((srtpCypher) => console.log(srtpCypher));
+        // getRtcStats(publisher).then((srtpCypher) => console.log(srtpCypher));
         stats.setPublisher(publisher);
         stats.startStats();
         stats.on('qualityLimitated', (event) => {
