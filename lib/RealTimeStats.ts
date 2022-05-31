@@ -1,23 +1,20 @@
 import log, { error } from 'loglevel';
 import { logPublisher, getRtcStats } from './utils/publisher';
 import { EventEmitter } from 'events';
-import { QualityEvent, RTCStatsReport, PacketLossEvent } from './types';
+import {
+  QualityEvent,
+  RTCStatsReport,
+  PacketLossEvent,
+  Publisher,
+  RealTimeOptions,
+} from './types';
 
-/**
+/**startStats
  * @private
  */
-export interface RealTimeOptions {
-  VideoPacketLossThreshold: number;
-
-  frameRateThreshold: number;
-
-  intervalStats: number;
-
-  triggerEvents?: boolean;
-}
 
 export interface VideoNetworkQualityStats {
-  on(event: 'qualityLimitated', listener: (event: QualityEvent) => void): this; // session connected event
+  on(event: 'qualityLimitated', listener: (event: QualityEvent) => void): this;
   on(
     event: 'qualityLimitatedStopped',
     listener: (event: QualityEvent) => void
@@ -66,11 +63,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this.layersWithPacketLoss = [];
   }
 
-  /**
-   * Returns true if the video stream processing is paused
-   */
-
-  setPublisher(publisher: OT.publisher) {
+  setPublisher(publisher: Publisher) {
     this._publisher = publisher;
   }
 
@@ -93,7 +86,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
             // rtt: result?.rtt ? result.rtt : 0,
           };
           this.simulcastLayers = [...this.simulcastLayers, newLayers];
-          // this.simulcastLayers.push()
+
           this.simulcastLayers.forEach((layer) => {
             if (
               layer.qualityLimitationReason !== 'none' &&
@@ -210,17 +203,29 @@ export class VideoNetworkQualityStats extends EventEmitter {
     }
   }
 
-  startStats(): void {
-    setInterval(async () => {
-      this.simulcastLayers = [];
-      this.packetLossArray = [];
-
-      const stats = await getRtcStats(this._publisher);
-      this.checkIfQualityLimited(stats);
-      this.checkVideoPacketLoss(stats);
-
-      return stats;
-    }, this._statsInterval);
+  async startStats(): Promise<void> {
+    return new Promise((res, rej) => {
+      setInterval(async () => {
+        this.simulcastLayers = [];
+        this.packetLossArray = [];
+        try {
+          if (
+            typeof this._publisher.getRtcStatsReport !== 'function' ||
+            !this._publisher
+          ) {
+            rej('Invalid publisher');
+          }
+          const stats = await getRtcStats(this._publisher);
+          if (stats && stats.length) {
+            this.checkIfQualityLimited(stats);
+            this.checkVideoPacketLoss(stats);
+            res();
+          } else rej('can not start rtcStats');
+        } catch (e) {
+          rej(e);
+        }
+      }, this._statsInterval);
+    });
   }
 
   stopStats() {
@@ -230,27 +235,37 @@ export class VideoNetworkQualityStats extends EventEmitter {
 
   async getCypher(): Promise<string> {
     return new Promise(async (res, rej) => {
-      const stats = await getRtcStats(this._publisher);
-      stats[0].rtcStatsReport.forEach((e: any) => {
-        if (e.type === 'transport') {
-          res(e.srtpCipher);
-        }
-      });
+      try {
+        const stats = await getRtcStats(this._publisher);
+        if (!stats) rej('Can not get cypher');
+        stats[0].rtcStatsReport.forEach((e: any) => {
+          if (e.type === 'transport') {
+            res(e.srtpCipher);
+          }
+        });
+      } catch (e) {
+        rej(e);
+      }
     });
   }
 
   async getConnectionType(): Promise<string> {
     return new Promise(async (res, rej) => {
-      const stats = await getRtcStats(this._publisher);
-      stats[0].rtcStatsReport.forEach((e: any) => {
-        if (e.type === 'local-candidate') {
-          if (e.candidateType === 'relay') {
-            res(`TURN ${e.relayProtocol}`);
-          } else {
-            res(e.protocol);
+      try {
+        const stats = await getRtcStats(this._publisher);
+        if (!stats) rej('Can not get connection type');
+        stats[0].rtcStatsReport.forEach((e: any) => {
+          if (e.type === 'local-candidate') {
+            if (e.candidateType === 'relay') {
+              res(`TURN ${e.relayProtocol}`);
+            } else {
+              res(e.protocol);
+            }
           }
-        }
-      });
+        });
+      } catch (e) {
+        rej(e);
+      }
     });
   }
 

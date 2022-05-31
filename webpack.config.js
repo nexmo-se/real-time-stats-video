@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
-const clientVersion = require('./lib/version.ts');
 
 module.exports = {
   entry: './lib/index.ts',
@@ -34,7 +33,6 @@ module.exports = {
     // new webpack.BannerPlugin({ banner: license, raw: true, entryOnly: true }),
     new webpack.EnvironmentPlugin({
       ENABLE_LOGGING: true,
-      CLIENT_VERSION: clientVersion,
     }),
   ],
   devtool: 'source-map',

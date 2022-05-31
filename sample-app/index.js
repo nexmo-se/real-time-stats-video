@@ -68,7 +68,21 @@ async function publishToSession() {
       }
     }
   );
-  const session = OT.initSession(apikey, sessionId);
+  const session = OT.initSession(
+    apikey,
+    sessionId
+    //   {
+    //   iceConfig: {
+    //     includeServers: 'all',
+    //     transportPolicy: 'relay',
+    //     customServers: [
+    //       {
+    //         urls: [],
+    //       },
+    //     ],
+    //   },
+    // }
+  );
   session.on('streamCreated', (stream) => {
     session.subscribe(stream, (err) => {
       if (err) console.error('Error while subscribing', err);
@@ -88,29 +102,40 @@ async function publishToSession() {
         console.error('Error while publishing into the session', errPublisher);
       else {
         console.log('Successfully published the stream');
-
         // getRtcStats(publisher).then((srtpCypher) => console.log(srtpCypher));
         stats.setPublisher(publisher);
-        stats.startStats();
-        stats.on('qualityLimitated', (event) => {
-          openToast('quality', 'The quality of your video is limited', 'show');
-          console.log(event);
-        });
-        stats.on('qualityLimitatedStopped', (event) => {
-          openToast('quality', 'The quality of your video is limited', 'hide');
-          console.log(event);
-        });
-        stats.on('highPacketLoss', (event) => {
-          openToast('packetLoss', 'You may face quality issues', 'show');
-          console.log(event);
-        });
-        stats.on('highPacketLossStopped', (event) => {
-          openToast('packetLoss', 'You may face quality issues', 'hide');
-          console.log(event);
-        });
+        stats
+          .startStats()
+          .then(() => {
+            stats.on('qualityLimitated', (event) => {
+              openToast(
+                'quality',
+                'The quality of your video is limited',
+                'show'
+              );
+              console.log(event);
+            });
+            stats.on('qualityLimitatedStopped', (event) => {
+              openToast(
+                'quality',
+                'The quality of your video is limited',
+                'hide'
+              );
+              console.log(event);
+            });
+            stats.on('highPacketLoss', (event) => {
+              openToast('packetLoss', 'You may face quality issues', 'show');
+              console.log(event);
+            });
+            stats.on('highPacketLossStopped', (event) => {
+              openToast('packetLoss', 'You may face quality issues', 'hide');
+              console.log(event);
+            });
 
-        stats.getCypher().then((c) => console.log(c));
-        stats.getConnectionType().then((c) => console.log(c));
+            stats.getCypher().then((c) => console.log(c));
+            stats.getConnectionType().then((c) => console.log(c));
+          })
+          .catch((e) => console.log(e));
       }
     });
   });

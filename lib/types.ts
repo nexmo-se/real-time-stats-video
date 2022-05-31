@@ -77,6 +77,51 @@ export type PacketLossEvent = {
   packetLoss: number;
 };
 
+export interface Event<Type, Target> {
+  type: Type;
+  cancelable: boolean;
+  target: Target;
+  isDefaultPrevented(): boolean;
+  preventDefault(): void;
+}
+
+export interface RealTimeOptions {
+  VideoPacketLossThreshold: number;
+
+  frameRateThreshold: number;
+
+  intervalStats: number;
+
+  triggerEvents?: boolean;
+}
+
+export interface OTEventEmitter<EventMap> {
+  on<EventName extends keyof EventMap>(
+    eventName: EventName,
+    callback: (event: EventMap[EventName]) => void
+  ): void;
+
+  once<EventName extends keyof EventMap>(
+    eventName: EventName,
+    callback: (event: EventMap[EventName]) => void
+  ): void;
+
+  off<EventName extends keyof EventMap>(
+    eventName?: EventName,
+    callback?: (event: EventMap[EventName]) => void
+  ): void;
+}
+
+export interface Publisher
+  extends OTEventEmitter<{
+  
+
+
+  getRtcStatsReport(
+    callback?: (error?: Error, stats?: PublisherRtcStatsReportArr) => void
+  ): Promise<PublisherRtcStatsReportArr> | undefined;
+}
+
 export interface RTCStatsReport {
   forEach(
     callbackfn: (value: any, key: string, parent: RTCStatsReport) => void,
@@ -85,6 +130,11 @@ export interface RTCStatsReport {
   type: string;
   // roundTripTime: number;
   kind: string;
+  ssrc: number
+  roundTripTime: number
+  jitter :number
+  packetsLost: number
+  fractionLost : number
 }
 
 export type PublisherRtcStatsReport = {
