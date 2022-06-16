@@ -42,7 +42,6 @@ async function publishToSession() {
   let publisher = OT.initPublisher(
     'publisher',
     {
-      //   videoSource: effectProcessor.outputStream.getVideoTracks()[0],
       resolution: '1280x720',
       width: 640,
       height: 480,

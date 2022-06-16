@@ -101,7 +101,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
               !this.wasQualityLimited
             ) {
               this.isQualityLimited = true;
-              this.emit('qualityLimitated', {
+              this.emit('qualityLimited', {
                 streamId: this._publisher.stream.id,
                 reason: layer.qualityLimitationReason,
                 id: layer.id,
@@ -113,7 +113,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
               this.isQualityLimited
             ) {
               this.isQualityLimited = false;
-              this.emit('qualityLimitatedStopped', {
+              this.emit('qualityLimitedStopped', {
                 streamId: this._publisher.stream.id,
                 reason: layer.qualityLimitationReason,
                 currentResolution: `${layer.width}X${layer.height}`,
