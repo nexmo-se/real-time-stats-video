@@ -43,6 +43,7 @@ async function publishToSession() {
     'publisher',
     {
       //   videoSource: effectProcessor.outputStream.getVideoTracks()[0],
+      resolution: '1280x720',
       width: 640,
       height: 480,
       publishAudio: false,
@@ -95,7 +96,7 @@ async function publishToSession() {
         stats
           .startStats()
           .then(() => {
-            stats.on('qualityLimitated', (event) => {
+            stats.on('qualityLimited', (event) => {
               openToast(
                 'quality',
                 'The quality of your video is limited',
@@ -103,7 +104,7 @@ async function publishToSession() {
               );
               console.log(event);
             });
-            stats.on('qualityLimitatedStopped', (event) => {
+            stats.on('qualityLimitedStopped', (event) => {
               openToast(
                 'quality',
                 'The quality of your video is limited',
