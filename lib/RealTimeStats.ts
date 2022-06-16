@@ -105,7 +105,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
                 streamId: this._publisher.stream.id,
                 reason: layer.qualityLimitationReason,
                 id: layer.id,
-                targetQuality: `${layer.width}X${layer.height}`,
+                currentResolution: `${layer.width}X${layer.height}`,
               });
             } else if (
               this.wasQualityLimited &&
@@ -116,7 +116,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
               this.emit('qualityLimitedStopped', {
                 streamId: this._publisher.stream.id,
                 reason: layer.qualityLimitationReason,
-                targetQuality: `${layer.width}X${layer.height}`,
+                currentResolution: `${layer.width}X${layer.height}`,
               });
             }
           });

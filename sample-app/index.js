@@ -37,18 +37,6 @@ const openToast = (type, message, action) => {
   }
 };
 
-async function getLocalMedia() {
-  try {
-    //return await OT.getUserMedia({audioSource: null, videoSource: true});
-    return await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: false,
-    });
-  } catch (err) {
-    console.error('OTGetUserMedia - err', err);
-  }
-}
-
 async function publishToSession() {
   // Create the publisher and publish into the session
   let publisher = OT.initPublisher(
