@@ -81,7 +81,6 @@ export interface RTCStatsReport {
     thisArg?: any
   ): void;
   type: string;
-  // roundTripTime: number;
   kind: string;
   ssrc: number;
   roundTripTime: number;

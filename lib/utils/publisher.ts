@@ -1,8 +1,6 @@
 import { Publisher, PublisherRtcStatsReport } from '../types';
 
-export async function getRtcStats(
-  publisher: Publisher
-): Promise<RTCStatsReport> {
+export async function getRtcStats(publisher: Publisher): Promise<any> {
   return new Promise(async (res, rej) => {
     try {
       if (typeof publisher.getRtcStatsReport !== 'function') {
