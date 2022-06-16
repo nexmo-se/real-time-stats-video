@@ -1,5 +1,7 @@
 # Vonage Video API - Real Time Stats
 
+This library intends to provide an easy way to leverage getRtcStats
+
 ## Prerequisites
 
 - [Vonage Video API SDK](https://www.npmjs.com/package/@opentok/client)

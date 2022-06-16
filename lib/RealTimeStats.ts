@@ -1,5 +1,5 @@
 import log, { error } from 'loglevel';
-import { logPublisher, getRtcStats } from './utils/publisher';
+import { getRtcStats } from './utils/publisher';
 import { EventEmitter } from 'events';
 import {
   QualityEvent,
@@ -7,11 +7,10 @@ import {
   PacketLossEvent,
   Publisher,
   RealTimeOptions,
+  PublisherRtcStatsReport,
+  PublisherRtcStatsReportArr,
+  timeStampObject,
 } from './types';
-
-/**startStats
- * @private
- */
 
 export interface VideoNetworkQualityStats {
   on(event: 'qualityLimitated', listener: (event: QualityEvent) => void): this;
@@ -30,22 +29,20 @@ export class VideoNetworkQualityStats extends EventEmitter {
   public _publisher: OT.Publisher;
   public _statsInterval: number;
   private _interval: setInterval;
-  private prevTimeStamp: {};
-  private prevPacketsSent: {};
+  private prevTimeStamp: {} = {};
+  private prevPacketsSent: {} = {};
   private simulcastLayers: any;
-  private isQualityLimitated: boolean;
+  private isQualityLimited: boolean;
   private wasQualityLimited: boolean;
   private hasPacketLoss: boolean;
   private hadPacketLoss: boolean;
-  private prevPacketsLost = {};
+  private prevPacketsLost: {} = {};
   private packetLossArray: any;
   private layersWithPacketLoss: any;
   public _VideoPacketLossThreshold: number;
 
   constructor(options: RealTimeOptions) {
     super();
-    // this._useWasm =
-    //   typeof options.useWasm === 'boolean' ? options.useWasm : true;
     this.prevTimeStamp = {};
     this.simulcastLayers = [];
     this.prevPacketsSent = {};
@@ -53,7 +50,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this._statsInterval = options.intervalStats;
     this._VideoPacketLossThreshold = options.VideoPacketLossThreshold;
     this._interval = null;
-    this.isQualityLimitated = false;
+    this.isQualityLimited = false;
     this.wasQualityLimited = false;
     this.hasPacketLoss = false;
     this.hadPacketLoss = false;
@@ -63,12 +60,22 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this.layersWithPacketLoss = [];
   }
 
+  /**
+   * Sets the publisher
+   * @param publisher represents the publisher
+   */
+
   setPublisher(publisher: Publisher) {
     this._publisher = publisher;
   }
 
-  checkIfQualityLimited(stats: RTCStatsReport) {
-    stats[0].rtcStatsReport.forEach((e: any) => {
+  /**
+   * Check if the quality of your outbound stream is limited due to CPU or bandwidth
+   * @param stats represents the array or rtcStatsReport
+   */
+
+  checkIfQualityLimited(stats: PublisherRtcStatsReportArr) {
+    stats[0].rtcStatsReport.forEach((e: RTCStatsReport) => {
       if (e.type === 'outbound-rtp' && e.kind === 'video') {
         if (this.prevTimeStamp[e.ssrc] && this.prevPacketsSent[e.ssrc]) {
           const timedif = e.timestamp - this.prevTimeStamp[e.ssrc];
@@ -90,10 +97,10 @@ export class VideoNetworkQualityStats extends EventEmitter {
           this.simulcastLayers.forEach((layer) => {
             if (
               layer.qualityLimitationReason !== 'none' &&
-              this.isQualityLimitated === false &&
+              this.isQualityLimited === false &&
               !this.wasQualityLimited
             ) {
-              this.isQualityLimitated = true;
+              this.isQualityLimited = true;
               this.emit('qualityLimitated', {
                 streamId: this._publisher.stream.id,
                 reason: layer.qualityLimitationReason,
@@ -103,9 +110,9 @@ export class VideoNetworkQualityStats extends EventEmitter {
             } else if (
               this.wasQualityLimited &&
               layer.qualityLimitationReason === 'none' &&
-              this.isQualityLimitated
+              this.isQualityLimited
             ) {
-              this.isQualityLimitated = false;
+              this.isQualityLimited = false;
               this.emit('qualityLimitatedStopped', {
                 streamId: this._publisher.stream.id,
                 reason: layer.qualityLimitationReason,
@@ -118,13 +125,19 @@ export class VideoNetworkQualityStats extends EventEmitter {
 
         this.prevPacketsSent[e.ssrc] = e.packetsSent;
         this.prevTimeStamp[e.ssrc] = e.timestamp;
-        this.wasQualityLimited = this.isQualityLimitated;
+
+        this.wasQualityLimited = this.isQualityLimited;
         // prevBytesSent[e.ssrc] = e.bytesSent;
       }
     });
   }
 
-  checkVideoPacketLoss(stats: any): void {
+  /**
+   * calculate if video packet loss is above the threshold
+   * @param stats represents the array or rtcStatsReport
+   */
+
+  checkVideoPacketLoss(stats: PublisherRtcStatsReportArr): void {
     stats[0].rtcStatsReport.forEach((e: RTCStatsReport) => {
       if (e.type === 'remote-inbound-rtp' && e.kind === 'video') {
         // const rtt = !isNaN(e.roundTripTime) ? e.roundTripTime : 0;
@@ -142,6 +155,10 @@ export class VideoNetworkQualityStats extends EventEmitter {
       }
     });
   }
+
+  /**
+   * processing of both arrays to calculate packet loss and emit the event if needed
+   */
 
   mergeArrays(): void {
     if (this.packetLossArray && this.simulcastLayers.length) {
@@ -203,6 +220,10 @@ export class VideoNetworkQualityStats extends EventEmitter {
     }
   }
 
+  /**
+   * start an interval that run getstats every X seconds. Configurable by the customer
+   */
+
   async startStats(): Promise<void> {
     return new Promise((res, rej) => {
       setInterval(async () => {
@@ -217,7 +238,11 @@ export class VideoNetworkQualityStats extends EventEmitter {
           }
           const stats = await getRtcStats(this._publisher);
           if (stats && stats.length) {
-            this.checkIfQualityLimited(stats);
+            console.log(stats);
+            //only chrome supports qualityLimited field in the outbound-rtp report
+            if (/chrome/i.test(navigator.userAgent)) {
+              this.checkIfQualityLimited(stats);
+            }
             this.checkVideoPacketLoss(stats);
             res();
           } else rej('can not start rtcStats');
@@ -228,10 +253,18 @@ export class VideoNetworkQualityStats extends EventEmitter {
     });
   }
 
+  /**
+   * stop the rtcstats interval
+   */
+
   stopStats() {
     clearInterval(this._interval);
     this._interval = null;
   }
+
+  /**
+   * returns the Srtp cipher used by the client
+   */
 
   async getCypher(): Promise<string> {
     return new Promise(async (res, rej) => {
@@ -248,6 +281,10 @@ export class VideoNetworkQualityStats extends EventEmitter {
       }
     });
   }
+
+  /**
+   * Returns the connection type, either UDP, TURN-udp, TURN-tcp, TURN-tls
+   */
 
   async getConnectionType(): Promise<string> {
     return new Promise(async (res, rej) => {
@@ -268,18 +305,6 @@ export class VideoNetworkQualityStats extends EventEmitter {
       }
     });
   }
-
-  /**
-   * Pauses all ongoing video stream processing. This should be used when video isn't published to not use the CPU without any need for it.
-   */
-  pauseStreamProcessing(pause: boolean) {
-    console.log('ss');
-  }
-
-  /**
-   * If the effect is currently applied to the stream returned by the startEffect method.
-   */
-  //   get effectEnabled(): boolean {}
 
   /**
    * Enables or disables the effect on the stream returned by the startEffect method. If set to false, the input video track will simply be forwarded to the output.
