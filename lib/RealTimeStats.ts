@@ -81,44 +81,46 @@ export class VideoNetworkQualityStats extends EventEmitter {
           const timedif = e.timestamp - this.prevTimeStamp[e.ssrc];
           const bytesDif = e.bytesSent - this.prevPacketsSent[e.ssrc];
           const bitSec = (8 * bytesDif) / timedif;
+          if (e.framesPerSecond) {
+            const newLayers = {
+              width: e.frameWidth,
+              height: e.frameHeight,
+              framesPerSecond: e.framesPerSecond,
+              qualityLimitationReason: e.qualityLimitationReason,
+              id: e.ssrc,
+              bytes: bitSec,
+              packetsDiff: e.packetsSent - this.prevPacketsSent[e.ssrc],
+              // rtt: result?.rtt ? result.rtt : 0,
+            };
 
-          const newLayers = {
-            width: e.frameWidth,
-            height: e.frameHeight,
-            framesPerSecond: e.framesPerSecond,
-            qualityLimitationReason: e.qualityLimitationReason,
-            id: e.ssrc,
-            bytes: bitSec,
-            packetsDiff: e.packetsSent - this.prevPacketsSent[e.ssrc],
-            // rtt: result?.rtt ? result.rtt : 0,
-          };
-          this.simulcastLayers = [...this.simulcastLayers, newLayers];
+            this.simulcastLayers = [...this.simulcastLayers, newLayers];
 
-          this.simulcastLayers.forEach((layer) => {
-            if (
-              layer.qualityLimitationReason !== 'none' &&
-              this.isQualityLimited === false &&
-              !this.wasQualityLimited
-            ) {
-              this.isQualityLimited = true;
-              this.emit('qualityLimited', {
-                streamId: this._publisher.stream.id,
-                reason: layer.qualityLimitationReason,
-                id: layer.id,
-                currentResolution: `${layer.width}X${layer.height}`,
-              });
-            } else if (
-              this.wasQualityLimited &&
-              layer.qualityLimitationReason === 'none' &&
-              this.isQualityLimited
-            ) {
-              this.isQualityLimited = false;
-              this.emit('qualityLimitedStopped', {
-                streamId: this._publisher.stream.id,
-                reason: layer.qualityLimitationReason,
-              });
-            }
-          });
+            this.simulcastLayers.forEach((layer) => {
+              if (
+                layer.qualityLimitationReason !== 'none' &&
+                this.isQualityLimited === false &&
+                !this.wasQualityLimited
+              ) {
+                this.isQualityLimited = true;
+                this.emit('qualityLimited', {
+                  streamId: this._publisher.stream.id,
+                  reason: layer.qualityLimitationReason,
+                  id: layer.id,
+                  currentResolution: `${layer.width}X${layer.height}`,
+                });
+              } else if (
+                this.wasQualityLimited &&
+                layer.qualityLimitationReason === 'none' &&
+                this.isQualityLimited
+              ) {
+                this.isQualityLimited = false;
+                this.emit('qualityLimitedStopped', {
+                  streamId: this._publisher.stream.id,
+                  reason: layer.qualityLimitationReason,
+                });
+              }
+            });
+          }
         }
 
         this.prevPacketsSent[e.ssrc] = e.packetsSent;
