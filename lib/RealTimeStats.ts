@@ -116,11 +116,9 @@ export class VideoNetworkQualityStats extends EventEmitter {
               this.emit('qualityLimitedStopped', {
                 streamId: this._publisher.stream.id,
                 reason: layer.qualityLimitationReason,
-                currentResolution: `${layer.width}X${layer.height}`,
               });
             }
           });
-          //   console.log(this.simulcastLayers);
         }
 
         this.prevPacketsSent[e.ssrc] = e.packetsSent;

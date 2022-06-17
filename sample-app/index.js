@@ -38,7 +38,7 @@ async function publishToSession() {
   let publisher = OT.initPublisher(
     'publisher',
     {
-      resolution: '1280x720',
+      // resolution: '1280x720',
       width: 640,
       height: 480,
       publishAudio: false,
