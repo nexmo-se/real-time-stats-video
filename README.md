@@ -2,7 +2,7 @@
 
 This library provides a wrapper built on top of [getRtcStatsReport API](https://tokbox.com/developer/sdks/js/reference/Publisher.html#getRtcStatsReport). The library exposes some methods and fires some events upon high packet loss or when the resolution is limited. For now, it only allows you to call the API on the publisher, but the subscribers may follow in the future.
 
-## Limitations
+## Limitations
 
 The field `qualityLimitationReason` (https://developer.mozilla.org/en-US/docs/Web/API/RTCOutboundRtpStreamStats/qualityLimitationReason) does not exist on Firefox. This means that the `qualityLimited` event won't fire up in Firefox.
 
