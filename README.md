@@ -17,7 +17,7 @@ The field `qualityLimitationReason` (https://developer.mozilla.org/en-US/docs/We
 You can install directly from npm.
 
 ```
-npm install @vonage/video-effects
+npm install
 ```
 
 Using this method, you can import `vonage-video-effects` like so:
