@@ -238,7 +238,6 @@ export class VideoNetworkQualityStats extends EventEmitter {
           }
           const stats = await getRtcStats(this._publisher);
           if (stats && stats.length) {
-            console.log(stats);
             //only chrome supports qualityLimited field in the outbound-rtp report
             if (/chrome/i.test(navigator.userAgent)) {
               this.checkIfQualityLimited(stats);
@@ -266,7 +265,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
    * returns the Srtp cipher used by the client
    */
 
-  async getCypher(): Promise<string> {
+  async getCipher(): Promise<string> {
     return new Promise(async (res, rej) => {
       try {
         const stats = await getRtcStats(this._publisher);

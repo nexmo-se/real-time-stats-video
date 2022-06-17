@@ -1,10 +1,6 @@
 'use strict';
 
-const {
-  logPublisher,
-  getRtcStats,
-  VideoNetworkQualityStats,
-} = OT.RealTimeStats;
+const { VideoNetworkQualityStats } = OT.RealTimeStats;
 
 const bootstrap = window.bootstrap;
 
@@ -120,7 +116,7 @@ async function publishToSession() {
               console.log(event);
             });
 
-            stats.getCypher().then((c) => console.log(c));
+            stats.getCipher().then((c) => console.log(c));
             stats.getConnectionType().then((c) => console.log(c));
           })
           .catch((e) => console.log(e));
