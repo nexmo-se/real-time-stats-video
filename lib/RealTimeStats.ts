@@ -47,8 +47,8 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this.simulcastLayers = [];
     this.prevPacketsSent = {};
     this._publisher = null;
-    this._statsInterval = options.intervalStats;
-    this._VideoPacketLossThreshold = options.VideoPacketLossThreshold;
+    this._statsInterval = options.intervalStats || 5000;
+    this._VideoPacketLossThreshold = options.VideoPacketLossThreshold | 5;
     this._interval = null;
     this.isQualityLimited = false;
     this.wasQualityLimited = false;

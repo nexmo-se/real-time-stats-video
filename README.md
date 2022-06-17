@@ -49,6 +49,25 @@ You can build the library locally following these steps:
 2. `npm run build-umd`
 3. `cd sample-app` and `npm install`. The app server will start on port 3000
 
+### VideoNetworkQualityStats
+
+The VideoNetworkQualityStats initialises the library.
+The constructor has the following options:
+
+| Option                   | Type   | Required | Description                                                                   |
+| ------------------------ | ------ | -------- | ----------------------------------------------------------------------------- |
+| intervalStats            | Number | Yes      | The interval at which get stats will be called in milleseconds (default 5000) |
+| VideoPacketLossThreshold | Number | Yes      | The threshold value for video packet loss in percentage (default 5%)          |
+
+Example:
+
+```js
+const stats = new VideoNetworkQualityStats({
+  intervalStats: 3000,
+  VideoPacketLossThreshold: 5,
+});
+```
+
 ### Events
 
 #### Events in stats
