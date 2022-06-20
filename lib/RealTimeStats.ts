@@ -70,6 +70,16 @@ export class VideoNetworkQualityStats extends EventEmitter {
   }
 
   /**
+   * Get the simulcast layers if the stream is simulcast capable
+   */
+
+  getSimulcastLayers() {
+    if (this.simulcastLayers.length) {
+      return this.simulcastLayers;
+    } else return new Error('no simulcast layers found');
+  }
+
+  /**
    * Check if the quality of your outbound stream is limited due to CPU or bandwidth
    * @param stats represents the array or rtcStatsReport
    */

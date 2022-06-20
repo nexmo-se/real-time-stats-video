@@ -68,6 +68,48 @@ const stats = new VideoNetworkQualityStats({
 });
 ```
 
+### Methods
+
+**setPublisher**: This method sets the publisher
+
+```js
+stats.setPublisher(publisher);
+```
+
+**startStats**: This method starts the stats interval
+
+```js
+stats
+  .startStats()
+  .then(() => console.log('stats started'))
+  .catch((e) => console.log(e));
+```
+
+**stopStats**: This method stops the stats interval
+
+```js
+stats.stopStats();
+```
+
+**getCipher**: This method returns the srtp cipher used by the publisher stream
+
+```js
+stats.getCipher().then((srtpCipher) => console.log(srtpCipher));
+```
+
+**getConnectionType**: This method returns the connection type (TURN-tls, TURN-tcp, TURN-upd, UDP)
+
+```js
+stats.getConnectionType().then((connectionType) => console.log(connectionType));
+```
+
+**getSimulcastLayers**: This method returns the simulcast layers used by the publisher
+
+```js
+const simulcastLayers = stats.getConnectionType();
+console.log(simulcastLayers);
+```
+
 ### Events
 
 #### Events in stats

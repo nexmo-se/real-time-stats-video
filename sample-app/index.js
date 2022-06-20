@@ -15,6 +15,8 @@ const sessionId =
 const token =
   'T1==cGFydG5lcl9pZD00NjI2NDk1MiZzaWc9ZDE0ZWM5MjFhZDZjNzk5MWU4MzI3NWNjNmZiN2FjYjMwYTFiM2NlNDpzZXNzaW9uX2lkPTFfTVg0ME5qSTJORGsxTW41LU1UWTFNelUyTXpNNE9EazBNMzVPYkUxTk9VeDNXRGwxYm05S2NrVTViMDFKVkRaMWExZC1mZyZjcmVhdGVfdGltZT0xNjUzNTYzNDAwJm5vbmNlPTAuMzM1OTQ1MTMxMzg5NzAxMDYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTY1NjE1NTQwMCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==';
 
+const connectionType = document.getElementById('connection__type');
+const srtpCipher = document.getElementById('srtp__cipher');
 const openToast = (type, message, action) => {
   const toast =
     type === 'quality'
@@ -116,8 +118,33 @@ async function publishToSession() {
               console.log(event);
             });
 
-            stats.getCipher().then((c) => console.log(c));
-            stats.getConnectionType().then((c) => console.log(c));
+            stats.getCipher().then((c) => {
+              srtpCipher.innerText = `Srtp cipher : ${c}`;
+            });
+            stats.getConnectionType().then((c) => {
+              connectionType.innerText = `Connection type : ${c}`;
+            });
+            setInterval(() => {
+              const table = document.querySelector('table');
+              table.style.display = 'block';
+              const bodyTable = document.getElementById('body__table');
+              bodyTable.innerHTML = '';
+              const layers = stats.getSimulcastLayers();
+              if (layers) {
+                layers.forEach((layer) => {
+                  const rowTable = `
+                    <tr>
+                    <th scope="row">${layer.id}</th>
+                    <td>${layer.width}</td>
+                    <td>${layer.height}</td>
+                    <td>${layer.qualityLimitationReason}</td>
+                    <td>${layer.framesPerSecond}</td>
+                   `;
+
+                  bodyTable.insertAdjacentHTML('afterbegin', rowTable);
+                });
+              }
+            }, 3000);
           })
           .catch((e) => console.log(e));
       }

@@ -11,3 +11,11 @@ body {
 #video-container {
   overflow: hidden;
 }
+
+#simulcastLayers {
+  width: 30%;
+}
+
+.table {
+  display: none;
+}
