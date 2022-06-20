@@ -20,7 +20,7 @@ You can install directly from npm.
 npm install
 ```
 
-Using this method, you can import `vonage-video-effects` like so:
+Using this method, you can import `vonage-real-time-stats` like so:
 
 ```ts
 import * as  from '';

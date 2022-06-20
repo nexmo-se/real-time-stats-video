@@ -1,5 +1,5 @@
 {
-  "name": "@vonage/video-realtine-stats",
+  "name": "@vonage/video-realtime-stats",
   "version": "0.0.1",
   "description": "Library to add real-time stats",
   "main": "dist/index.js",

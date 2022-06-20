@@ -150,7 +150,6 @@ export class VideoNetworkQualityStats extends EventEmitter {
   checkVideoPacketLoss(stats: PublisherRtcStatsReportArr): void {
     stats[0].rtcStatsReport.forEach((e: RTCStatsReport) => {
       if (e.type === 'remote-inbound-rtp' && e.kind === 'video') {
-        // const rtt = !isNaN(e.roundTripTime) ? e.roundTripTime : 0;
         const rttObject = {
           ssrc: e.ssrc,
           rtt: e.roundTripTime,
@@ -313,44 +312,5 @@ export class VideoNetworkQualityStats extends EventEmitter {
         rej(e);
       }
     });
-  }
-
-  /**
-   * Enables or disables the effect on the stream returned by the startEffect method. If set to false, the input video track will simply be forwarded to the output.
-   * @param enable defines if the effect should be applied to the returned stream
-   */
-  //   enableEffect(enable: boolean) {
-  //     if (this.effectEnabled === enable) return;
-
-  //     this._effectEnabled = enable;
-  //     log.debug('effectEnabled changed to', enable);
-  //     if (this._outputState !== OutputState.PAUSED)
-  //       this.setOutputState(
-  //         enable ? OutputState.EFFECT_APPLIED : OutputState.INPUT_FORWARDING
-  //       );
-  //   }
-
-  private setOutputState(state: OutputState) {
-    // this.applyOutputState();
-  }
-
-  /**
-   * Returns the previously set media stream
-   */
-  //   public get inputStream(): MediaStream {
-  //     return this._inputStream;
-  //   }
-
-  /**
-   * Sets / changes the input stream to the given stream. The effect will be applied to this stream and then forwarded to the ouput.
-   * @param stream the stream to use for the video input
-   */
-
-  /**
-   * Returns the output stream with the effect applied to it
-   */
-
-  public destroy() {
-    log.debug('destroy');
   }
 }
