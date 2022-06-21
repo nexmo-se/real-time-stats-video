@@ -32,8 +32,6 @@ export interface Event<Type, Target> {
 export interface RealTimeOptions {
   VideoPacketLossThreshold: number;
 
-  frameRateThreshold: number;
-
   intervalStats: number;
 
   triggerEvents?: boolean;
