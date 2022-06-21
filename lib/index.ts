@@ -11,8 +11,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 window.OT.RealTimeStats = {
-  getRtcStats,
   VideoNetworkQualityStats,
 };
 
-export { getRtcStats };
+export { VideoNetworkQualityStats };
