@@ -5,11 +5,11 @@ import {
   QualityEvent,
   RTCStatsReport,
   PacketLossEvent,
-  Publisher,
   RealTimeOptions,
   PublisherRtcStatsReport,
   PublisherRtcStatsReportArr,
   timeStampObject,
+  OT,
 } from './types';
 
 export interface VideoNetworkQualityStats {
@@ -26,17 +26,17 @@ export interface VideoNetworkQualityStats {
 }
 
 export class VideoNetworkQualityStats extends EventEmitter {
-  public _publisher: OT.Publisher;
+  private _publisher: OT.Publisher;
   public _statsInterval: number;
-  private _interval: setInterval;
-  private prevTimeStamp: {} = {};
-  private prevPacketsSent: {} = {};
+  private _interval: any;
+  private prevTimeStamp: any;
+  private prevPacketsSent: any;
   private simulcastLayers: any;
   private isQualityLimited: boolean;
   private wasQualityLimited: boolean;
   private hasPacketLoss: boolean;
   private hadPacketLoss: boolean;
-  private prevPacketsLost: {} = {};
+  private prevPacketsLost: any;
   private packetLossArray: any;
   private layersWithPacketLoss: any;
   public _VideoPacketLossThreshold: number;
@@ -46,7 +46,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this.prevTimeStamp = {};
     this.simulcastLayers = [];
     this.prevPacketsSent = {};
-    this._publisher = null;
+    this._publisher;
     this._statsInterval = options.intervalStats || 5000;
     this._VideoPacketLossThreshold = options.VideoPacketLossThreshold | 5;
     this._interval = null;
@@ -65,7 +65,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
    * @param publisher represents the publisher
    */
 
-  setPublisher(publisher: Publisher) {
+  setPublisher(publisher: OT.Publisher) {
     this._publisher = publisher;
   }
 
@@ -105,7 +105,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
 
             this.simulcastLayers = [...this.simulcastLayers, newLayers];
 
-            this.simulcastLayers.forEach((layer) => {
+            this.simulcastLayers.forEach((layer: any) => {
               if (
                 layer.qualityLimitationReason !== 'none' &&
                 this.isQualityLimited === false &&
@@ -113,7 +113,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
               ) {
                 this.isQualityLimited = true;
                 this.emit('qualityLimited', {
-                  streamId: this._publisher.stream.id,
+                  streamId: this._publisher?.stream?.id,
                   reason: layer.qualityLimitationReason,
                   id: layer.id,
                   currentResolution: `${layer.width}X${layer.height}`,
@@ -125,7 +125,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
               ) {
                 this.isQualityLimited = false;
                 this.emit('qualityLimitedStopped', {
-                  streamId: this._publisher.stream.id,
+                  streamId: this._publisher?.stream?.id,
                   reason: layer.qualityLimitationReason,
                 });
               }
@@ -137,7 +137,6 @@ export class VideoNetworkQualityStats extends EventEmitter {
         this.prevTimeStamp[e.ssrc] = e.timestamp;
 
         this.wasQualityLimited = this.isQualityLimited;
-        // prevBytesSent[e.ssrc] = e.bytesSent;
       }
     });
   }
@@ -190,11 +189,13 @@ export class VideoNetworkQualityStats extends EventEmitter {
 
             const maxSsrc = Math.max.apply(
               Math,
-              this.layersWithPacketLoss.map(function(layer) {
+              this.layersWithPacketLoss.map(function(layer: any) {
                 return layer.id;
               })
             );
-            const upperLayer = this.layersWithPacketLoss.find(function(layer) {
+            const upperLayer = this.layersWithPacketLoss.find(function(
+              layer: any
+            ) {
               return layer.id == maxSsrc;
             });
             if (
@@ -204,7 +205,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
             ) {
               this.hasPacketLoss = true;
               this.emit('highPacketLoss', {
-                streamId: this._publisher.stream.id,
+                streamId: this._publisher?.stream?.id,
                 type: 'video',
                 action: 'highPacketLossDetected',
                 packetLossThreshold: this._VideoPacketLossThreshold,
@@ -216,7 +217,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
             ) {
               this.hasPacketLoss = false;
               this.emit('highPacketLossStopped', {
-                streamId: this._publisher.stream.id,
+                streamId: this._publisher?.stream?.id,
                 type: 'video',
                 action: 'highPacketLossStopped',
                 packetLossThreshold: this._VideoPacketLossThreshold,

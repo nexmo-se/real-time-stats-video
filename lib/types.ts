@@ -1,19 +1,12 @@
 // /**
 //  * @private
 //  */
-// declare global {
-//   interface Window {
-//     chrome: any;
-//     createTFLiteSIMDModule: () => Promise<any>;
-//     OT: Object & { RealTimeStats?: any };
-//     OffscreenCanvas: any;
-//   }
-// }
+declare global {
+  interface Window {
+    OT: Object & { RealTimeStats?: any };
+  }
+}
 
-/*
-{10000: 1653990650001.964
-10001: 1653990650001.964}
-*/
 export type ssrc = number;
 
 export type timeStampObject = {
@@ -67,12 +60,6 @@ export interface OTEventEmitter<EventMap> {
   ): void;
 }
 
-export interface Publisher {
-  getRtcStatsReport(
-    callback?: (error?: Error, stats?: PublisherRtcStatsReportArr) => void
-  ): Promise<PublisherRtcStatsReportArr> | undefined;
-}
-
 export type PublisherRtcStatsReportArr = PublisherRtcStatsReport[];
 
 export interface RTCStatsReport {
@@ -99,3 +86,39 @@ export interface RTCStatsReport {
 export type PublisherRtcStatsReport = {
   rtcStatsReport: RTCStatsReport;
 };
+
+export namespace OT {
+  /**
+   * OpenTok.js Client SDK
+   */
+  // Publisher;
+
+  export interface Publisher {
+    stream?: Stream;
+    getRtcStatsReport(
+      callback?: (error?: Error, stats?: PublisherRtcStatsReportArr) => void
+    ): Promise<PublisherRtcStatsReportArr> | undefined;
+  }
+}
+
+export interface Stream {
+  connection: Connection;
+  creationTime: number;
+  frameRate: number;
+  hasAudio: boolean;
+  hasVideo: boolean;
+  name: string;
+  id: string;
+  streamId: string;
+  videoDimensions: {
+    width: number;
+    height: number;
+  };
+  videoType: 'camera' | 'screen';
+}
+
+export interface Connection {
+  connectionId: string;
+  creationTime: number;
+  data: string;
+}
