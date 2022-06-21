@@ -9,10 +9,6 @@ declare global {
 
 export type ssrc = number;
 
-export type timeStampObject = {
-  ssrc: {};
-};
-
 export type QualityEvent = {
   streanId: string;
   reason: string;

@@ -6,9 +6,7 @@ import {
   RTCStatsReport,
   PacketLossEvent,
   RealTimeOptions,
-  PublisherRtcStatsReport,
   PublisherRtcStatsReportArr,
-  timeStampObject,
   OT,
 } from './types';
 
