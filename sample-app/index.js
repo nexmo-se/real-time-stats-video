@@ -9,11 +9,9 @@ const stats = new VideoNetworkQualityStats({
   VideoPacketLossThreshold: 5,
 });
 
-const apikey = '46264952';
-const sessionId =
-  '1_MX40NjI2NDk1Mn5-MTY1MzU2MzM4ODk0M35ObE1NOUx3WDl1bm9KckU5b01JVDZ1a1d-fg';
-const token =
-  'T1==cGFydG5lcl9pZD00NjI2NDk1MiZzaWc9ZDE0ZWM5MjFhZDZjNzk5MWU4MzI3NWNjNmZiN2FjYjMwYTFiM2NlNDpzZXNzaW9uX2lkPTFfTVg0ME5qSTJORGsxTW41LU1UWTFNelUyTXpNNE9EazBNMzVPYkUxTk9VeDNXRGwxYm05S2NrVTViMDFKVkRaMWExZC1mZyZjcmVhdGVfdGltZT0xNjUzNTYzNDAwJm5vbmNlPTAuMzM1OTQ1MTMxMzg5NzAxMDYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTY1NjE1NTQwMCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==';
+const apikey = 'api_key';
+const sessionId = 'session_id';
+const token = 'token';
 
 const connectionType = document.getElementById('connection__type');
 const srtpCipher = document.getElementById('srtp__cipher');

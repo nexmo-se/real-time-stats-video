@@ -1,4 +1,3 @@
-import log, { error } from 'loglevel';
 import { getRtcStats } from './utils/publisher';
 import { EventEmitter } from 'events';
 import {
