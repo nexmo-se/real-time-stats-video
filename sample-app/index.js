@@ -130,10 +130,10 @@ async function publishToSession() {
               const bodyTable = document.getElementById('body__table');
               bodyTable.innerHTML = '';
               const layers = stats.getSimulcastLayers();
-              try {
-                if (layers) {
-                  layers.forEach((layer) => {
-                    const rowTable = `
+
+              if (layers.length) {
+                layers.forEach((layer) => {
+                  const rowTable = `
                     <tr>
                     <th scope="row">${layer.id}</th>
                     <td>${layer.width}</td>
@@ -142,11 +142,8 @@ async function publishToSession() {
                     <td>${layer.framesPerSecond}</td>
                    `;
 
-                    bodyTable.insertAdjacentHTML('afterbegin', rowTable);
-                  });
-                }
-              } catch (e) {
-                console.log(e);
+                  bodyTable.insertAdjacentHTML('afterbegin', rowTable);
+                });
               }
             }, 5000);
           })

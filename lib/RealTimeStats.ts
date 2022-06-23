@@ -73,7 +73,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
   getSimulcastLayers() {
     if (this.simulcastLayers.length) {
       return this.simulcastLayers;
-    } else return new Error('no simulcast layers found');
+    } else return [];
   }
 
   /**
