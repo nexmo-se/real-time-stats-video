@@ -9,9 +9,11 @@ const stats = new VideoNetworkQualityStats({
   VideoPacketLossThreshold: 5,
 });
 
-const apikey = 'api_key';
-const sessionId = 'session_id';
-const token = 'token';
+const apikey = '46264952';
+const sessionId =
+  '1_MX40NjI2NDk1Mn5-MTY1NTk3OTU3NjI1N35aUzdleWo1Nk01aFA1ODdlKzNIWVgzRXZ-fg';
+const token =
+  'T1==cGFydG5lcl9pZD00NjI2NDk1MiZzaWc9NDg3ZjBiYTc0MDY5M2Q1NjIyNDEyMzg0MjNlNjU5OWIxOTBkZmQwYzpzZXNzaW9uX2lkPTFfTVg0ME5qSTJORGsxTW41LU1UWTFOVGszT1RVM05qSTFOMzVhVXpkbGVXbzFOazAxYUZBMU9EZGxLek5JV1ZnelJYWi1mZyZjcmVhdGVfdGltZT0xNjU1OTc5NTg5Jm5vbmNlPTAuMTkwODc4Mzk3NTg3OTU3MzMmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTY1NjA2NTk4OCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==';
 
 const connectionType = document.getElementById('connection__type');
 const srtpCipher = document.getElementById('srtp__cipher');
@@ -128,9 +130,10 @@ async function publishToSession() {
               const bodyTable = document.getElementById('body__table');
               bodyTable.innerHTML = '';
               const layers = stats.getSimulcastLayers();
-              if (layers) {
-                layers.forEach((layer) => {
-                  const rowTable = `
+              try {
+                if (layers) {
+                  layers.forEach((layer) => {
+                    const rowTable = `
                     <tr>
                     <th scope="row">${layer.id}</th>
                     <td>${layer.width}</td>
@@ -139,10 +142,13 @@ async function publishToSession() {
                     <td>${layer.framesPerSecond}</td>
                    `;
 
-                  bodyTable.insertAdjacentHTML('afterbegin', rowTable);
-                });
+                    bodyTable.insertAdjacentHTML('afterbegin', rowTable);
+                  });
+                }
+              } catch (e) {
+                console.log(e);
               }
-            }, 3000);
+            }, 5000);
           })
           .catch((e) => console.log(e));
       }
