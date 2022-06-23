@@ -1,7 +1,7 @@
 {
   "name": "@vonage/video-realtime-stats",
   "version": "0.1.0",
-  "description": "Library to add real-time stats",
+  "description": "Library to add real-time stats to your Vonage Video application",
   "main": "dist/index.js",
   "repository": {
     "url": "https://github.com/nexmo-se/real-time-stats-video"
