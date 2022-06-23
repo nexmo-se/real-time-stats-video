@@ -27,7 +27,7 @@ npm install
 Using this method, you can import `vonage-real-time-stats` like so:
 
 ```ts
-import * as  from '';
+import * as VideoStats from '@vonage/video-realtime-stats';
 ```
 
 ### Script tag
