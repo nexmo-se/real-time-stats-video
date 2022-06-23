@@ -1,6 +1,6 @@
 {
   "name": "@vonage/video-realtime-stats",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Library to add real-time stats to your Vonage Video application",
   "main": "dist/index.js",
   "repository": {
