@@ -2,9 +2,13 @@
 
 This library provides a wrapper built on top of [getRtcStatsReport API](https://tokbox.com/developer/sdks/js/reference/Publisher.html#getRtcStatsReport). The library exposes some methods and fires some events upon high packet loss or when the resolution is limited. For now, it only provides data on the publisher, but the subscribers may follow in the future.
 
-## Limitations
+## Limitations/Known issues
 
-The field `qualityLimitationReason` (https://developer.mozilla.org/en-US/docs/Web/API/RTCOutboundRtpStreamStats/qualityLimitationReason) does not exist on Firefox. This means that the `qualityLimited` event won't fire up in Firefox.
+- The field `qualityLimitationReason` (https://developer.mozilla.org/en-US/docs/Web/API/RTCOutboundRtpStreamStats/qualityLimitationReason) does not exist on Firefox. This means that the `qualityLimited` event won't fire up in Firefox.
+
+- If you try to publish `1280X720` resolution and there are no users subscribing to your stream, the Vonage Media Server will intentionally limit the quality that you can send to avoid a waste of resources. This would trigger the `qualityLimited` event immediately. You can consider setting the `stats.on('qualityLimited', handler)` event listener only when there are more than 2 connections in the call or do a subscribers check on the callback function.
+
+`stats.on('qualityLimited', ()=> if (subscribers > 0) updateUI)`
 
 ## Prerequisites
 
@@ -103,7 +107,7 @@ stats.getCipher().then((srtpCipher) => console.log(srtpCipher));
 stats.getConnectionType().then((connectionType) => console.log(connectionType));
 ```
 
-**getSimulcastLayers**: This method returns the simulcast layers used by the publisher
+**getSimulcastLayers**: This method returns the simulcast layers used by the publisher. Simulcast is a publisher property that, in supported endpoints, allows the publisher to send several quality layers so that the media server can decide which one to forward to every subscriber depending on their network conditions. Depending on the resolution that you set when you initialise the publisher and your network conditions, you can see up to 3 different quality layers, containing the `fps`, width and height `qualityLimitationReason`, and `id` and an accumulator for the `bytesSent`.
 
 ```js
 const simulcastLayers = stats.getConnectionType();
