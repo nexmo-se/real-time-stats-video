@@ -10,3 +10,8 @@
 
 - Renaming getConnectionType() -> getMediaTransportType()
 - Fixing typo on videoPacketLossThreshold
+
+# 0.1.3 (Jun 24, 2022)
+
+- Fixing typo on the README (getSimulcastLayers)
+- Adding more info on simulcastLayers for non-simulcast connections
