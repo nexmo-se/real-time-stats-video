@@ -5,3 +5,8 @@
 # 0.1.1 (Jun 23, 2022)
 
 - Fixing Readme with instructions to use the library from npm
+
+# 0.1.2 (Jun 24, 2022)
+
+- Renaming getConnectionType() -> getMediaTransportType()
+- Fixing typo on videoPacketLossThreshold

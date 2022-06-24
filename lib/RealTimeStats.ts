@@ -45,7 +45,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
     this.prevPacketsSent = {};
     this._publisher;
     this._statsInterval = options.intervalStats || 5000;
-    this._VideoPacketLossThreshold = options.VideoPacketLossThreshold | 5;
+    this._VideoPacketLossThreshold = options.VideoPacketLossThreshold || 5;
     this._interval = null;
     this.isQualityLimited = false;
     this.wasQualityLimited = false;
@@ -292,7 +292,7 @@ export class VideoNetworkQualityStats extends EventEmitter {
    * Returns the connection type, either UDP, TURN-udp, TURN-tcp, TURN-tls
    */
 
-  async getConnectionType(): Promise<string> {
+  async getMediaTransportType(): Promise<string> {
     return new Promise(async (res, rej) => {
       try {
         const stats = await getRtcStats(this._publisher);

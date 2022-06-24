@@ -6,7 +6,7 @@ const bootstrap = window.bootstrap;
 
 const stats = new VideoNetworkQualityStats({
   intervalStats: 3000,
-  VideoPacketLossThreshold: 5,
+  VideoPacketLossThreshold: 2,
 });
 
 const apikey = '46264952';
@@ -121,7 +121,7 @@ async function publishToSession() {
             stats.getCipher().then((c) => {
               srtpCipher.innerText = `Srtp cipher : ${c}`;
             });
-            stats.getConnectionType().then((c) => {
+            stats.getMediaTransportType().then((c) => {
               connectionType.innerText = `Connection type : ${c}`;
             });
             setInterval(() => {
