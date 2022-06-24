@@ -101,10 +101,12 @@ stats.stopStats();
 stats.getCipher().then((srtpCipher) => console.log(srtpCipher));
 ```
 
-**getConnectionType**: This method returns the connection type (TURN-tls, TURN-tcp, TURN-upd, UDP)
+**getMediaTransportType**: This method returns the connection type (TURN-tls, TURN-tcp, TURN-upd, UDP)
 
 ```js
-stats.getConnectionType().then((connectionType) => console.log(connectionType));
+stats
+  .getMediaTransportType()
+  .then((connectionType) => console.log(connectionType));
 ```
 
 **getSimulcastLayers**: This method returns the simulcast layers used by the publisher. Simulcast is a publisher property that, in supported endpoints, allows the publisher to send several quality layers so that the media server can decide which one to forward to every subscriber depending on their network conditions. Depending on the resolution that you set when you initialise the publisher and your network conditions, you can see up to 3 different quality layers, containing the `fps`, width and height `qualityLimitationReason`, and `id` and an accumulator for the `bytesSent`.
