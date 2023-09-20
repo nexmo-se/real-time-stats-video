@@ -9,26 +9,19 @@ const stats = new VideoNetworkQualityStats({
   VideoPacketLossThreshold: 2,
 });
 
-const apikey = '46264952';
-const sessionId =
-  '1_MX40NjI2NDk1Mn5-MTY1NTk3OTU3NjI1N35aUzdleWo1Nk01aFA1ODdlKzNIWVgzRXZ-fg';
+const apikey = '46469012';
+const sessionId = '2_MX40NjQ2OTAxMn5-MTY5NTE5ODQyNTQzMX5NKzkweVhUdzVTNUZkYkErTm5DTXdQS3Z-fn4';
 const token =
-  'T1==cGFydG5lcl9pZD00NjI2NDk1MiZzaWc9NDg3ZjBiYTc0MDY5M2Q1NjIyNDEyMzg0MjNlNjU5OWIxOTBkZmQwYzpzZXNzaW9uX2lkPTFfTVg0ME5qSTJORGsxTW41LU1UWTFOVGszT1RVM05qSTFOMzVhVXpkbGVXbzFOazAxYUZBMU9EZGxLek5JV1ZnelJYWi1mZyZjcmVhdGVfdGltZT0xNjU1OTc5NTg5Jm5vbmNlPTAuMTkwODc4Mzk3NTg3OTU3MzMmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTY1NjA2NTk4OCZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==';
+  'T1==cGFydG5lcl9pZD00NjQ2OTAxMiZzaWc9NTY4MzdkMGEzYzIwYTQzYjEwM2FlMjhkMzAwMTc4MmRhNTRjMGRkYzpzZXNzaW9uX2lkPTJfTVg0ME5qUTJPVEF4TW41LU1UWTVOVEU1T0RReU5UUXpNWDVOS3prd2VWaFVkelZUTlVaa1lrRXJUbTVEVFhkUVMzWi1mbjQmY3JlYXRlX3RpbWU9MTY5NTE5ODQ0NiZub25jZT0wLjQ5NjAxMzMwMDA1MjI1NTMmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTY5NTgwMzI0NSZpbml0aWFsX2xheW91dF9jbGFzc19saXN0PQ==';
 
 const connectionType = document.getElementById('connection__type');
 const srtpCipher = document.getElementById('srtp__cipher');
 const openToast = (type, message, action) => {
-  const toast =
-    type === 'quality'
-      ? document.getElementById('toast')
-      : document.getElementById('toastPacketLoss');
+  const toast = type === 'quality' ? document.getElementById('toast') : document.getElementById('toastPacketLoss');
   // const toast = document.getElementById('toast');
   if (action === 'show') {
     toast.classList.add('show');
-    const toastBody =
-      type === 'quality'
-        ? document.getElementById('toast-body')
-        : document.getElementById('toast-body-packetLoss');
+    const toastBody = type === 'quality' ? document.getElementById('toast-body') : document.getElementById('toast-body-packetLoss');
     toastBody.innerText = message;
   } else {
     toast.classList.remove('show');
@@ -84,8 +77,7 @@ async function publishToSession() {
     console.log('Session Connected');
 
     session.publish(publisher, (errPublisher) => {
-      if (errPublisher)
-        console.error('Error while publishing into the session', errPublisher);
+      if (errPublisher) console.error('Error while publishing into the session', errPublisher);
       else {
         console.log('Successfully published the stream');
         // getRtcStats(publisher).then((srtpCypher) => console.log(srtpCypher));
@@ -94,19 +86,11 @@ async function publishToSession() {
           .startStats()
           .then(() => {
             stats.on('qualityLimited', (event) => {
-              openToast(
-                'quality',
-                'The quality of your video is limited',
-                'show'
-              );
+              openToast('quality', 'The quality of your video is limited', 'show');
               console.log(event);
             });
             stats.on('qualityLimitedStopped', (event) => {
-              openToast(
-                'quality',
-                'The quality of your video is limited',
-                'hide'
-              );
+              openToast('quality', 'The quality of your video is limited', 'hide');
               console.log(event);
             });
             stats.on('highPacketLoss', (event) => {
@@ -121,7 +105,7 @@ async function publishToSession() {
             stats.getCipher().then((c) => {
               srtpCipher.innerText = `Srtp cipher : ${c}`;
             });
-            stats.getMediaTransportType().then((c) => {
+            stats.getConnectionType().then((c) => {
               connectionType.innerText = `Connection type : ${c}`;
             });
             setInterval(() => {
